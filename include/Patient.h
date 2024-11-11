@@ -35,8 +35,8 @@ class Patient{
         void set_age_out(int a);
         void set_modality_policy(double p);
         void set_modality_dstb(std::uniform_real_distribution<> dstb);
-        void set_att_probs(double p[2][4]);
 
+        // getter methods
         int get_pathway();
         int get_base_duration();
         int get_arrival_t();
