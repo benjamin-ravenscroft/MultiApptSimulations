@@ -6,6 +6,10 @@
 
 Server::Server(Waitlist &wl, DischargeList &dl) : waitlist(wl), discharge_list(dl) {}
 
+Server::Server(int max_caseload, Waitlist &wl, DischargeList &dl) : waitlist(wl), discharge_list(dl) {
+    set_max_caseload(max_caseload);
+}
+
 void Server::add_patient(Patient &patient) {
     caseload.push_back(patient);
     n_patients += 1;
@@ -32,17 +36,20 @@ void Server::process_extension(Patient patient, int epoch){
 
 void Server::process_epoch(int epoch){
     // std::cout << "Processing epoch. n_patients: " << n_patients << " Caseload len: " << caseload.size() << std::endl;
-    if (n_patients == 0) {
+    int capacity = 1;
+    if (n_patients < max_caseload) {
         if (caseload.size() > n_patients) {
             std::cout << "Caseload size: " << caseload.size() << " n_patients: " << n_patients << std::endl;
             throw std::runtime_error("Error - Line 38");
         }
         add_from_waitlist(epoch);
-    } else {
+    }
+    while (capacity > 0 & n_patients > 0) {
         Patient p = caseload.front();
         caseload.pop_front();
-        int check = p.process_patient(epoch, waitlist.len_waitlist());
-        if (check == 1 | check == 2) { // if they have reached their service_max
+        std::array<int, 2> results = p.process_patient(epoch, waitlist.len_waitlist());
+        capacity -= results[0];
+        if (results[1] == 1 | results[1] == 2) { // if they have reached their service_max
             p.set_discharge_time(epoch);
             discharge_list.add_patient(p);
             n_patients -= 1;
@@ -53,6 +60,7 @@ void Server::process_epoch(int epoch){
                 throw std::runtime_error("Error - Line 84");
             }
         }
+        // std::cout << "Capacity: " << capacity << std::endl;
     }
 }
 

@@ -11,11 +11,13 @@ class Patient{
         std::uniform_real_distribution<double> dis;
 
         Patient(int arrival_time, double arrival_age, int pathway, int base_duration,
-                double wait_ext_beta, double modality_ext_beta, std::mt19937 &gen);
+                double wait_ext_beta, double modality_ext_beta, double modality_policy,
+                const std::array<std::array<double, 4>, 2> &att_probs,
+                std::mt19937 &gen);
 
         void add_appt(int epoch);
         void add_wait(int wlist_arr_t, int add_t);
-        int process_patient(int epoch, int wl_len);
+        std::array<int, 2> process_patient(int epoch, int wl_len);
 
         // setters
         void set_arrival_time(int t);
@@ -31,6 +33,9 @@ class Patient{
         void set_discharge_duration(int d);
         void set_modality_effect(double m);
         void set_age_out(int a);
+        void set_modality_policy(double p);
+        void set_modality_dstb(std::uniform_real_distribution<> dstb);
+        void set_att_probs(double p[2][4]);
 
         int get_pathway();
         int get_base_duration();
@@ -44,6 +49,7 @@ class Patient{
         int get_total_wait_time();
         int get_discharge_duration();
         int get_age_out();
+        double get_pct_face();
 
     private:
         int arrival_time;
@@ -54,7 +60,7 @@ class Patient{
         double serv_red_beta;
         int serv_red_cap;
         std::vector<int> appt_epochs;
-        int modality_sum;
+        float modality_sum;
         int extended = 0;
         double ext_prob_cap;
         double base_ext_p;
@@ -65,13 +71,17 @@ class Patient{
         int ext_cap = 1;
         int discharge_duration = 0;
         double modality_effect = 0.5;
+        double modality_policy = 1.0;
         int age_out = 0;
+        std::uniform_real_distribution<> modality_dstb;
+        const std::array<std::array<double, 4>, 2> att_probs;
 
         double calculate_wait_effect();
         void add_wait_effect();
         double calculate_modality_effect();
         void add_modality_effect();
-        int check_complete(int wl_len, int epoch);
+        int check_complete(int epoch);
+        int check_attendance(int modality);
 
         // Setter methods
         

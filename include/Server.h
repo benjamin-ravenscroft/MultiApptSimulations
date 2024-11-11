@@ -9,6 +9,8 @@
 class Server{
     public:
         Server(Waitlist &wl, DischargeList &dl);
+        Server(int max_caseload, Waitlist &wl, DischargeList &dl);
+
         void add_patient(Patient &patient);
         void add_from_waitlist(int epoch);
         void process_extension(Patient patient, int epoch);

@@ -51,10 +51,10 @@ bool Waitlist::check_availability(int epoch){
                 std::pair<Patient, int> pair = waitlist[i].front();
                 pair.first.set_discharge_time(epoch);
                 pair.first.set_age_out(1);
-                std::cout << "Getting discharge list size: " << discharge_list.get_n_patients() << std::endl;
-                std::cout << "Discharging patient from waitlist..." << std::endl;
+                // std::cout << "Getting discharge list size: " << discharge_list.get_n_patients() << std::endl;
+                // std::cout << "Discharging patient from waitlist..." << std::endl;
                 discharge_list.add_patient(pair.first);
-                std::cout << "Successfully discharged patient from waitlist." << std::endl;
+                // std::cout << "Successfully discharged patient from waitlist." << std::endl;
                 waitlist[i].pop_front();
             }
         }

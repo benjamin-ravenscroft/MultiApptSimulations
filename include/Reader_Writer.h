@@ -46,6 +46,9 @@ static std::shared_ptr<GroupNode> SetupSchema() {
     fields.push_back(PrimitiveNode::Make("discharge_duration", Repetition::REQUIRED,
                                         Type::INT32, parquet::ConvertedType::INT_32));
 
+    fields.push_back(PrimitiveNode::Make("pct_face", Repetition::REQUIRED,
+                                        Type::DOUBLE, parquet::ConvertedType::NONE)); 
+
     fields.push_back(PrimitiveNode::Make("age_out", Repetition::REQUIRED,
                                         Type::INT32, parquet::ConvertedType::INT_32));
 

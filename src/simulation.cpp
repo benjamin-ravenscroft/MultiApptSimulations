@@ -22,22 +22,27 @@
 std::random_device rd;
 std::mt19937 rng(rd());
 
-Simulation::Simulation(int n_epochs, std::vector<int> clinicians, double arr_lam,
+Simulation::Simulation(int n_epochs, std::vector<int> clinicians, 
+                        int max_caseload, double arr_lam,
                         std::vector<int> pathways, std::vector<double> wait_effects,
-                        std::vector<double> modality_effects, std::vector<double> probs,
-                        std::vector<double> age_params, double max_ax_age,
-                        std::string wl_path,
+                        std::vector<double> modality_effects, std::vector<double> modality_policies,
+                        double att_probs[2][4],
+                        std::vector<double> probs, std::vector<double> age_params, 
+                        double max_ax_age, std::string wl_path,
                         DischargeList& dl, Waitlist& wl) : dl(dl), wl(wl) {
 
         Simulation::set_n_epochs(n_epochs);
         Simulation::set_clinicians(clinicians);
+        Simulation::set_max_caseload(max_caseload);
         Simulation::set_arr_lam(arr_lam);
         Simulation::set_pathways(pathways);
         Simulation::set_wait_effects(wait_effects);
         Simulation::set_modality_effects(modality_effects);
+        Simulation::set_modality_policies(modality_policies);
         Simulation::set_n_classes(pathways.size());
         Simulation::set_class_dstb(std::discrete_distribution<> (probs.begin(), probs.end()));
         Simulation::set_age_dstb(std::normal_distribution<> (age_params[0], age_params[1]));
+        Simulation::set_att_probs(att_probs);
 
         // setup output stream for waitlist statistics
         std::cout << "Setting up waitlist output stream" << std::endl;
@@ -57,18 +62,32 @@ Simulation::Simulation(int n_epochs, std::vector<int> clinicians, double arr_lam
 // Setter methods
 void Simulation::set_n_epochs(int n){n_epochs = n;}
 void Simulation::set_clinicians(std::vector<int> c){clinicians = c;}
+void Simulation::set_max_caseload(int m){max_caseload = m;}
 void Simulation::set_arr_lam(double l){arr_lam = l;}
 void Simulation::set_pathways(std::vector<int> ps){pathways = ps;}
 void Simulation::set_wait_effects(std::vector<double> ws){wait_effects = ws;}
 void Simulation::set_modality_effects(std::vector<double> ms){modality_effects = ms;}
+void Simulation::set_modality_policies(std::vector<double> ps){modality_policies = ps;}
 void Simulation::set_probs(std::vector<double> ps){probs = ps;}
 void Simulation::set_n_classes(int n){n_classes = n;}
 void Simulation::set_class_dstb(std::discrete_distribution<> dstb){class_dstb = dstb;}
 void Simulation::set_age_dstb(std::normal_distribution<> dstb){age_dstb = dstb;}
-// void Simulation::set_discharge_list(std::string p){dl = DischargeList(p);}
-// void Simulation::set_waitlist(int n, std::mt19937 &gen, double max_ax_age, DischargeList &dl){
-//     wl = Waitlist(n, max_ax_age, gen, dl);
-// }
+void Simulation::set_att_probs(double p[2][4]){
+    for (int i = 0; i < 2; i++){
+        double sum = 0;
+        for (int j = 0; j < 4; j++){
+            sum += p[i][j];
+            att_probs[i][j] = sum;
+        }
+    }
+
+    for (int i = 0; i < 2; i++){
+        for (int j = 0; j < 4; j++){
+            std::cout << att_probs[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
 
 // Getter methods
 double Simulation::get_arr_age(){
@@ -85,7 +104,7 @@ double Simulation::get_arr_age(){
 void Simulation::generate_servers() {
     for (int i = 0; i < clinicians.size(); i++) {
         for (int j = 0; j < clinicians[i]; j++) {
-            servers.push_back(Server(wl, dl));
+            servers.push_back(Server(max_caseload, wl, dl));
         }
     }
 }
@@ -100,10 +119,12 @@ void Simulation::generate_arrivals(int epoch) {
         double arr_age = get_arr_age();
         Patient pat = Patient(epoch, arr_age, pat_class, pathways[pat_class],
                             wait_effects[pat_class], modality_effects[pat_class],
+                            modality_policies[pat_class], att_probs,
                             rng);
         wl.add_patient(pat, epoch);
         // std::cout << "Waitlist length after adding patient: " << wl.len_waitlist() << std::endl;
     }
+    // std::cout << "successfuly generated arrivals" << std::endl;
 }
 
 void Simulation::run() {
@@ -117,6 +138,7 @@ void Simulation::run() {
     }
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
+    std::cout << "Simulation duration: " << duration.count() << "s." << std::endl;
 }
 
 int Simulation::get_n_admitted(){return n_admitted;}
@@ -171,11 +193,17 @@ int main(int argc, char *argv[]){
     std::string extension_protocols[1] = {"Standard"};
     int n_epochs = 10000;
     std::vector<int> clinicians = {(40)};
+    int max_caseload = 1;
     double arr_lam = 10;
     std::vector<int> serv_path = {7, 10, 13};
     std::vector<double> wait_effects = {1.2, 1.2, 1.2};
     std::vector<double> modality_effects = {0.5, 0.5, 0.5};
     std::vector<double> probs = {0.33, 0.33, 0.33};
+    std::vector<double> modality_policies = {0.5, 0.5, 0.5};
+    double att_probs[2][4] = {
+        {0.879,0.025,0.063,0.033},
+        {0.836,0.047,0.067,0.049}
+    };
     double max_ax_age = 3.0;
     int runs = 1;
     std::vector<double> age_params = {1.5, 1.0};
@@ -212,11 +240,13 @@ int main(int argc, char *argv[]){
         // initialize waitlist and discharge list instances
         DischargeList dl = DischargeList(run_path);
         Waitlist wl = Waitlist(serv_path.size(), max_ax_age, rng, dl);
-        Simulation sim = Simulation(n_epochs, clinicians, arr_lam,
+        Simulation sim = Simulation(n_epochs, clinicians, 
+                                    max_caseload, arr_lam,
                                     serv_path, wait_effects, 
-                                    modality_effects, probs,
-                                    age_params, max_ax_age, 
-                                    waitlist_path,
+                                    modality_effects, modality_policies,
+                                    att_probs,
+                                    probs, age_params, 
+                                    max_ax_age, waitlist_path,
                                     dl, wl);
         sim.generate_servers();
         sim.run();
