@@ -205,10 +205,10 @@ int main(int argc, char *argv[]){
     int max_caseload = 1;
     double arr_lam = 10;
     std::vector<int> serv_path = {7, 10, 13};
-    std::vector<double> wait_effects = {1.2, 1.2, 1.2};
-    std::vector<double> modality_effects = {0.15, 0.0, -0.15};
+    std::vector<double> wait_effects = {0.6, 0.6, 0.6};
+    std::vector<double> modality_effects = {0.5, 0.0, -0.5};
     std::vector<double> probs = {0.33, 0.33, 0.33};
-    std::vector<double> modality_policies = {0.5, 0.5, 0.5};
+    std::vector<double> modality_policies = {0.5, 0, 1};
     double att_probs[2][4] = {
         {0.879,0.025,0.063,0.033},
         {0.836,0.047,0.067,0.049}
@@ -226,7 +226,7 @@ int main(int argc, char *argv[]){
 
     // set priority ordering of waitlist
     std::vector<int> p_order = {0, 1, 2};
-    bool priority_wlist = false;
+    bool priority_wlist = true;
 
     std::string folder = "/mnt/d/OneDrive - University of Waterloo/KidsAbility Research/Service Duration Analysis/C++ Simulations/";
 

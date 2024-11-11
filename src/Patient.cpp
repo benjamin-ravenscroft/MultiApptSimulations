@@ -78,7 +78,7 @@ void Patient::add_wait_effect(){
     float wait_effect = calculate_wait_effect();
     float whole = floor(wait_effect);
     float frac = wait_effect - whole;
-    if (modality_dstb(rng) < frac) {
+    if (modality_dstb(rng) < 1 - frac) {
         Patient::set_base_duration(base_duration + int(whole));
     } else {
         Patient::set_base_duration(base_duration + int(whole) + 1);
@@ -94,7 +94,7 @@ void Patient::add_modality_effect(){
     float m_eff = calculate_modality_effect();
     float whole = floor(m_eff);
     float frac = m_eff - whole;
-    if (modality_dstb(rng) < frac) {
+    if (modality_dstb(rng) < 1 - frac) {
         Patient::set_service_duration(base_duration + int(whole));
     } else {
         Patient::set_service_duration(base_duration + int(whole) + 1);
