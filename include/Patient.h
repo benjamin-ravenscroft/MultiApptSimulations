@@ -16,7 +16,7 @@ class Patient{
                 std::mt19937 &gen);
 
         void add_appt(int epoch);
-        void add_wait(int wlist_arr_t, int add_t);
+        void add_wait(int add_t);
         std::array<int, 2> process_patient(int epoch, int wl_len);
 
         // setters
@@ -49,7 +49,8 @@ class Patient{
         int get_total_wait_time();
         int get_discharge_duration();
         int get_age_out();
-        double get_pct_face();
+        float get_pct_face();
+        int get_modality_sum();
 
     private:
         int arrival_time;
@@ -60,7 +61,7 @@ class Patient{
         double serv_red_beta;
         int serv_red_cap;
         std::vector<int> appt_epochs;
-        float modality_sum;
+        int modality_sum = 0;
         int extended = 0;
         double ext_prob_cap;
         double base_ext_p;
@@ -76,12 +77,15 @@ class Patient{
         std::uniform_real_distribution<> modality_dstb;
         const std::array<std::array<double, 4>, 2> att_probs;
 
-        double calculate_wait_effect();
+        float calculate_wait_effect();
         void add_wait_effect();
-        double calculate_modality_effect();
+        float calculate_modality_effect();
         void add_modality_effect();
         int check_complete(int epoch);
         int check_attendance(int modality);
+
+        // Incrementer methods
+        void increment_modality_sum(int m);
 
         // Setter methods
         

@@ -19,8 +19,25 @@ Waitlist::Waitlist(int n_classes, double max_ax_age,
     }
 }
 
+Waitlist::Waitlist(int n_classes, double max_ax_age, 
+                bool priority_wlist, std::vector<int> (&p_order),
+                std::mt19937 &gen, DischargeList& dl) : priority_order(p_order), discharge_list(dl) {
+    rng = gen;
+    set_max_ax_age(max_ax_age);
+    set_priority_wlist(priority_wlist);
+    for (int i = 0; i < n_classes; i++){
+        if (priority_wlist) {
+            classes.push_back(p_order[i]);
+        } else {
+            classes.push_back(i);
+        }
+        waitlist.push_back(std::deque<std::pair<Patient, int>>());
+    }
+}
+
 // setter methods
 void Waitlist::set_max_ax_age(double m){max_ax_age = m;}
+void Waitlist::set_priority_wlist(bool p){priority_wlist = p;}
 
 int Waitlist::len_waitlist(){
     int len = 0;
@@ -63,7 +80,9 @@ bool Waitlist::check_availability(int epoch){
 }
 
 std::pair<Patient, int> Waitlist::get_patient(int epoch){
-    std::shuffle(classes.begin(), classes.end(), rng);
+    if (!priority_wlist) {
+        std::shuffle(classes.begin(), classes.end(), rng);
+    }
     for (auto & i : classes){
         if (waitlist[i].size() > 0){
             std::pair<Patient, int> pair = waitlist[i].front();

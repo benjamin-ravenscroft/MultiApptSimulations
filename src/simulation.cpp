@@ -188,16 +188,25 @@ void Simulation::stream_waitlist(int epoch){
     wl_os << epoch << wl.len_waitlist() << parquet::EndRow;
 }
 
+// functions for main
+int utilization_to_servers(float utilization, std::vector<int> pathways,
+                            std::vector<double> probs, double arr_lam){
+    float mu = 0;
+    for (int i = 0; i < pathways.size(); i++){
+        mu += probs[i]*arr_lam*pathways[i];
+    }
+    return ceil(mu/utilization);
+}
+
 int main(int argc, char *argv[]){
     // std::string extension_protocols[3] = {"Standard", "Reduced Frequency", "Waitlist"};
     std::string extension_protocols[1] = {"Standard"};
     int n_epochs = 10000;
-    std::vector<int> clinicians = {(40)};
     int max_caseload = 1;
     double arr_lam = 10;
     std::vector<int> serv_path = {7, 10, 13};
     std::vector<double> wait_effects = {1.2, 1.2, 1.2};
-    std::vector<double> modality_effects = {0.5, 0.5, 0.5};
+    std::vector<double> modality_effects = {0.15, 0.0, -0.15};
     std::vector<double> probs = {0.33, 0.33, 0.33};
     std::vector<double> modality_policies = {0.5, 0.5, 0.5};
     double att_probs[2][4] = {
@@ -207,6 +216,17 @@ int main(int argc, char *argv[]){
     double max_ax_age = 3.0;
     int runs = 1;
     std::vector<double> age_params = {1.5, 1.0};
+
+    // get number of clinicians from utilization
+    // float utilization = 1;
+    // int n_clinicians = utilization_to_servers(utilization, serv_path, probs, arr_lam);
+    // std::cout << "Number of clinicians for utilization " << utilization << ": " << n_clinicians << std::endl;
+    int n_clinicians = 80;
+    std::vector<int> clinicians = {n_clinicians};
+
+    // set priority ordering of waitlist
+    std::vector<int> p_order = {0, 1, 2};
+    bool priority_wlist = false;
 
     std::string folder = "/mnt/d/OneDrive - University of Waterloo/KidsAbility Research/Service Duration Analysis/C++ Simulations/";
 
@@ -239,7 +259,9 @@ int main(int argc, char *argv[]){
         std::string waitlist_path = wl_path + ("waitlist_data_" + std::to_string(run) + ".parquet");
         // initialize waitlist and discharge list instances
         DischargeList dl = DischargeList(run_path);
-        Waitlist wl = Waitlist(serv_path.size(), max_ax_age, rng, dl);
+        Waitlist wl = Waitlist(serv_path.size(), max_ax_age,
+                                priority_wlist, p_order,
+                                rng, dl);
         Simulation sim = Simulation(n_epochs, clinicians, 
                                     max_caseload, arr_lam,
                                     serv_path, wait_effects, 

@@ -22,7 +22,7 @@ void Server::add_patient(Patient &patient) {
 void Server::add_from_waitlist(int epoch){
     if (waitlist.check_availability(epoch)) {
         std::pair<Patient, int> pair = waitlist.get_patient(epoch);
-        pair.first.add_wait(pair.second, epoch);
+        pair.first.add_wait(epoch);
         add_patient(pair.first);
     } else if (logging) {
         std::cout << "No patients on waitlist to add." << std::endl;

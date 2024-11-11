@@ -11,7 +11,7 @@ Patient::Patient(int arrival_time, double arrival_age, int pathway, int base_dur
     Patient::set_arrival_time(arrival_time);
     Patient::set_pathway(pathway);
     Patient::set_base_duration(base_duration);
-    Patient::set_service_duration(base_duration);
+    // Patient::set_service_duration(base_duration);    // service duration is set to base duration initially
     Patient::set_wait_ext_beta(wait_ext_beta);
     Patient::set_modality_ext_beta(modality_ext_beta);
     Patient::set_modality_policy(modality_policy);
@@ -24,8 +24,9 @@ void Patient::add_appt(int epoch){
     appt_epochs.push_back(epoch);
 }
 
-void Patient::add_wait(int wlist_arr_t, int add_t){
-    total_wait_time += (add_t - wlist_arr_t)/52;    // convert weeks to years
+void Patient::add_wait(int add_t){
+    total_wait_time += add_t - arrival_time;
+    Patient::add_wait_effect();
 }
 
 int Patient::check_attendance(int modality) {
@@ -53,6 +54,8 @@ std::array<int, 2> Patient::process_patient(int epoch, int wl_len){
     switch (att) {
         case 0:
             Patient::add_appt(epoch);
+            Patient::increment_modality_sum(modality); // increment modality sum
+            Patient::add_modality_effect();
             check = Patient::check_complete(epoch);
             return std::array<int, 2> {1, check};
         case 1:
@@ -65,22 +68,37 @@ std::array<int, 2> Patient::process_patient(int epoch, int wl_len){
 }
 
 // calculate the effect of waiting on service duration
-double Patient::calculate_wait_effect(){
-    return wait_ext_beta*total_wait_time;
+float Patient::calculate_wait_effect(){
+    return wait_ext_beta*(float(total_wait_time)/52);  // convert weeks to years
 }
 
 // add the wait time effect to service duration
+// Round wait effect to integer
 void Patient::add_wait_effect(){
-    base_duration += calculate_wait_effect();
+    float wait_effect = calculate_wait_effect();
+    float whole = floor(wait_effect);
+    float frac = wait_effect - whole;
+    if (modality_dstb(rng) < frac) {
+        Patient::set_base_duration(base_duration + int(whole));
+    } else {
+        Patient::set_base_duration(base_duration + int(whole) + 1);
+    }
 }
 
 // calculate the proportion of in-person visits
-double Patient::calculate_modality_effect(){
-    return modality_effect*modality_sum/appt_epochs.size();
+float Patient::calculate_modality_effect(){
+    return modality_effect*float(modality_sum)/float(appt_epochs.size());
 }
 
 void Patient::add_modality_effect(){
-    service_duration = base_duration + calculate_modality_effect();
+    float m_eff = calculate_modality_effect();
+    float whole = floor(m_eff);
+    float frac = m_eff - whole;
+    if (modality_dstb(rng) < frac) {
+        Patient::set_service_duration(base_duration + int(whole));
+    } else {
+        Patient::set_service_duration(base_duration + int(whole) + 1);
+    }
 }
 
 // check if the patient has completed their service
@@ -101,7 +119,10 @@ int Patient::check_complete(int epoch){
 void Patient::set_arrival_time(int t){arrival_time=t;}
 void Patient::set_arrival_age(double a){arrival_age=a;}
 void Patient::set_pathway(int p){pathway=p;}
-void Patient::set_base_duration(int d){base_duration=d;}
+void Patient::set_base_duration(int d){
+    base_duration=d;
+    service_duration=d; // simultaneously update service duration
+}
 void Patient::set_service_duration(int d){service_duration=d;}
 void Patient::set_base_ext_p(double p){base_ext_p=p;}
 void Patient::set_wait_ext_beta(double b){wait_ext_beta=b;}
@@ -148,9 +169,14 @@ int Patient::get_discharge_duration(){return discharge_duration;}
 
 int Patient::get_age_out(){return age_out;}
 
-double Patient::get_pct_face(){
+float Patient::get_pct_face(){
     if (appt_epochs.size() == 0) {
         return 0.0;
     }
-    return modality_sum/appt_epochs.size();
+    return float(modality_sum)/float(appt_epochs.size());
 }
+
+int Patient::get_modality_sum(){return modality_sum;}
+
+// Incrementer methods
+void Patient::increment_modality_sum(int m){modality_sum += m;}
