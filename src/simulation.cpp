@@ -10,6 +10,7 @@
 
 #include "arrow/io/file.h"
 #include "parquet/stream_writer.h"
+#include <cxxopts.hpp>
 
 #include "Simulation.h"
 #include "Patient.h"
@@ -79,13 +80,6 @@ void Simulation::set_att_probs(double p[2][4]){
             sum += p[i][j];
             att_probs[i][j] = sum;
         }
-    }
-
-    for (int i = 0; i < 2; i++){
-        for (int j = 0; j < 4; j++){
-            std::cout << att_probs[i][j] << " ";
-        }
-        std::cout << std::endl;
     }
 }
 
@@ -200,54 +194,75 @@ int utilization_to_servers(float utilization, std::vector<int> pathways,
 
 int main(int argc, char *argv[]){
     // std::string extension_protocols[3] = {"Standard", "Reduced Frequency", "Waitlist"};
-    std::string extension_protocols[1] = {"Standard"};
-    int n_epochs = 10000;
-    int max_caseload = 1;
-    double arr_lam = 10;
-    std::vector<int> serv_path = {7, 10, 13};
-    std::vector<double> wait_effects = {0.6, 0.6, 0.6};
-    std::vector<double> modality_effects = {0.5, 0.0, -0.5};
-    std::vector<double> probs = {0.33, 0.33, 0.33};
-    std::vector<double> modality_policies = {0.5, 0, 1};
+    // std::string extension_protocols[1] = {"Standard"};
+    // int n_epochs = 10000;
+    // int max_caseload = 1;
+    // double arr_lam = 10;
+    // std::vector<int> serv_path = {7, 10, 13};
+    // std::vector<double> wait_effects = {0.6, 0.6, 0.6};
+    // std::vector<double> modality_effects = {0.5, 0.0, -0.5};
+    // std::vector<double> probs = {0.33, 0.33, 0.33};
+    // std::vector<double> modality_policies = {0.5, 0, 1};
+    // double max_ax_age = 3.0;
+    // int runs = 1;
+    // std::vector<double> age_params = {1.5, 1.0};
+
+    // // get number of clinicians from utilization
+    // // float utilization = 1;
+    // // int n_clinicians = utilization_to_servers(utilization, serv_path, probs, arr_lam);
+    // // std::cout << "Number of clinicians for utilization " << utilization << ": " << n_clinicians << std::endl;
+    // int n_clinicians = 80;
+    // std::vector<int> clinicians = {n_clinicians};
+
+    // // set priority ordering of waitlist
+    // std::vector<int> p_order = {0, 1, 2};
+    // bool priority_wlist = true;
+
+    std::string folder = "/mnt/d/OneDrive - University of Waterloo/KidsAbility Research/Service Duration Analysis/C++ Simulations/";
+
+    // setup options parsing
+    cxxopts::Options options("Service Duration Simulation", "Simulate service duration for multi-class, multi-server queueing system.");
+    options.add_options()
+        ("n,n_epochs", "Number of epochs", cxxopts::value<int>()->default_value("10000"))
+        ("c,clinicians", "Number of clinicians", cxxopts::value<std::vector<int>>()->default_value("80"))
+        ("m,max_caseload", "Maximum caseload per clinician", cxxopts::value<int>()->default_value("1"))
+        ("a,arr_lam", "Arrival rate lambda", cxxopts::value<double>()->default_value("10"))
+        ("f,folder", "Output folder", cxxopts::value<std::string>()->default_value("test/"))
+        ("p,pathways", "Class pathways", cxxopts::value<std::vector<int>>()->default_value("7,10,13"))
+        ("w,wait_effects", "Wait time effects", cxxopts::value<std::vector<double>>()->default_value("0.6,0.6,0.6"))
+        ("e,modality_effects", "Modality effects", cxxopts::value<std::vector<double>>()->default_value("0.5,0.0,-0.5"))
+        ("o,modality_policies", "Modality policies", cxxopts::value<std::vector<double>>()->default_value("0.5,0,1"))
+        ("x,max_ax_age", "Maximum age for ax", cxxopts::value<double>()->default_value("3.0"))
+        ("g,age_params", "Age parameters", cxxopts::value<std::vector<double>>()->default_value("1.5,1.0"))
+        ("priority_order", "Priority order of waitlist", cxxopts::value<std::vector<int>>()->default_value("0,1,2"))
+        ("priority_wlist", "Priority waitlist", cxxopts::value<bool>()->default_value("true"))
+        ("arrival_probs", "Arrival probabilities", cxxopts::value<std::vector<double>>()->default_value("0.33,0.33,0.33"))
+        ("r,runs", "Number of runs", cxxopts::value<int>()->default_value("1"));
+    ;
+
+    auto result = options.parse(argc, argv);
+
+    int n_epochs = result["n_epochs"].as<int>();
+    std::vector<int> clinicians = result["clinicians"].as<std::vector<int>>();
+    int max_caseload = result["max_caseload"].as<int>();
+    double arr_lam = result["arr_lam"].as<double>();
+    std::vector<double> probs = result["arrival_probs"].as<std::vector<double>>();
+    folder += result["folder"].as<std::string>();
+    std::vector<int> serv_path = result["pathways"].as<std::vector<int>>();
+    std::vector<double> wait_effects = result["wait_effects"].as<std::vector<double>>();
+    std::vector<double> modality_effects = result["modality_effects"].as<std::vector<double>>();
+    std::vector<double> modality_policies = result["modality_policies"].as<std::vector<double>>();
+    double max_ax_age = result["max_ax_age"].as<double>();
+    std::vector<double> age_params = result["age_params"].as<std::vector<double>>();
+    std::vector<int> p_order = result["priority_order"].as<std::vector<int>>();
+    bool priority_wlist = result["priority_wlist"].as<bool>();
+    int runs = result["runs"].as<int>();
+
+    // set cancellation likelihoods
     double att_probs[2][4] = {
         {0.879,0.025,0.063,0.033},
         {0.836,0.047,0.067,0.049}
     };
-    double max_ax_age = 3.0;
-    int runs = 1;
-    std::vector<double> age_params = {1.5, 1.0};
-
-    // get number of clinicians from utilization
-    // float utilization = 1;
-    // int n_clinicians = utilization_to_servers(utilization, serv_path, probs, arr_lam);
-    // std::cout << "Number of clinicians for utilization " << utilization << ": " << n_clinicians << std::endl;
-    int n_clinicians = 80;
-    std::vector<int> clinicians = {n_clinicians};
-
-    // set priority ordering of waitlist
-    std::vector<int> p_order = {0, 1, 2};
-    bool priority_wlist = true;
-
-    std::string folder = "/mnt/d/OneDrive - University of Waterloo/KidsAbility Research/Service Duration Analysis/C++ Simulations/";
-
-    // parse command-line args if passed
-    if (argc > 1) {
-        if (argc == 11) {
-            std::cout << "Processing with CLI arguments." << std::endl;
-            n_epochs=std::stoi(argv[1]);
-            arr_lam=std::stod(argv[2]);
-            runs=std::atof(argv[9]);
-            folder = argv[10];
-        } else {
-            throw std::invalid_argument("Parameter Arguments Invalid Size Error: Attempted to pass parameter arguments, but too few included. n_args: " + std::to_string(argc));
-        }
-    } else {
-        folder += "test/";
-    }
-
-    std::vector<std::pair<std::string, double>> parameters{std::pair("n_epochs", n_epochs), std::pair("servers", clinicians[0]),
-                                                            std::pair("runs", runs), std::pair("arr_lam", arr_lam)};
-    write_csv(folder+"parameters.csv", parameters);
 
     // create output paths
     std::string path = folder;
