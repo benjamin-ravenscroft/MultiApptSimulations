@@ -64,10 +64,11 @@ CMAKE_BINARY_DIR = /home/benja/kidsAbility/MultiApptSimulations/build
 
 # The main recursive "all" target.
 all: CMakeFiles/simulation.dir/all
+all: extern/cxxopts/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
-preinstall:
+preinstall: extern/cxxopts/preinstall
 .PHONY : preinstall
 
 # The main recursive "clean" target.
@@ -100,7 +101,38 @@ clean: CMakeFiles/ContinuousCoverage.dir/clean
 clean: CMakeFiles/ContinuousMemCheck.dir/clean
 clean: CMakeFiles/ContinuousSubmit.dir/clean
 clean: CMakeFiles/simulation.dir/clean
+clean: extern/cxxopts/clean
 .PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory extern/cxxopts
+
+# Recursive "all" directory target.
+extern/cxxopts/all: extern/cxxopts/include/all
+.PHONY : extern/cxxopts/all
+
+# Recursive "preinstall" directory target.
+extern/cxxopts/preinstall: extern/cxxopts/include/preinstall
+.PHONY : extern/cxxopts/preinstall
+
+# Recursive "clean" directory target.
+extern/cxxopts/clean: extern/cxxopts/include/clean
+.PHONY : extern/cxxopts/clean
+
+#=============================================================================
+# Directory level rules for directory extern/cxxopts/include
+
+# Recursive "all" directory target.
+extern/cxxopts/include/all:
+.PHONY : extern/cxxopts/include/all
+
+# Recursive "preinstall" directory target.
+extern/cxxopts/include/preinstall:
+.PHONY : extern/cxxopts/include/preinstall
+
+# Recursive "clean" directory target.
+extern/cxxopts/include/clean:
+.PHONY : extern/cxxopts/include/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/Experimental.dir

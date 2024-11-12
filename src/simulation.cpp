@@ -30,6 +30,7 @@ Simulation::Simulation(int n_epochs, std::vector<int> clinicians,
                         double att_probs[2][4],
                         std::vector<double> probs, std::vector<double> age_params, 
                         double max_ax_age, std::string wl_path,
+                        bool waitlist_logging,
                         DischargeList& dl, Waitlist& wl) : dl(dl), wl(wl) {
 
         Simulation::set_n_epochs(n_epochs);
@@ -44,20 +45,23 @@ Simulation::Simulation(int n_epochs, std::vector<int> clinicians,
         Simulation::set_class_dstb(std::discrete_distribution<> (probs.begin(), probs.end()));
         Simulation::set_age_dstb(std::normal_distribution<> (age_params[0], age_params[1]));
         Simulation::set_att_probs(att_probs);
+        Simulation::set_waitlist_logging(waitlist_logging);
 
         // setup output stream for waitlist statistics
-        std::cout << "Setting up waitlist output stream" << std::endl;
-        std::shared_ptr<arrow::io::FileOutputStream> outfile;
-        PARQUET_ASSIGN_OR_THROW(
-            outfile,
-            arrow::io::FileOutputStream::Open(wl_path)
-        );
-        std::cout << "Opened output file" << std::endl;
-        std::shared_ptr<parquet::schema::GroupNode> schema = SetupSchema_Waitlist();
-        parquet::WriterProperties::Builder builder;
-        builder.compression(parquet::Compression::GZIP);
-        wl_os = parquet::StreamWriter(parquet::ParquetFileWriter::Open(outfile, schema, builder.build()));
-        std::cout << "Setup waitlist output stream" << std::endl;
+        if (waitlist_logging) {
+            std::cout << "Setting up waitlist output stream" << std::endl;
+            std::shared_ptr<arrow::io::FileOutputStream> outfile;
+            PARQUET_ASSIGN_OR_THROW(
+                outfile,
+                arrow::io::FileOutputStream::Open(wl_path)
+            );
+            std::cout << "Opened output file" << std::endl;
+            std::shared_ptr<parquet::schema::GroupNode> schema = SetupSchema_Waitlist();
+            parquet::WriterProperties::Builder builder;
+            builder.compression(parquet::Compression::GZIP);
+            wl_os = parquet::StreamWriter(parquet::ParquetFileWriter::Open(outfile, schema, builder.build()));
+            std::cout << "Setup waitlist output stream" << std::endl;
+        }
 }
 
 // Setter methods
@@ -73,6 +77,7 @@ void Simulation::set_probs(std::vector<double> ps){probs = ps;}
 void Simulation::set_n_classes(int n){n_classes = n;}
 void Simulation::set_class_dstb(std::discrete_distribution<> dstb){class_dstb = dstb;}
 void Simulation::set_age_dstb(std::normal_distribution<> dstb){age_dstb = dstb;}
+void Simulation::set_waitlist_logging(bool wl){waitlist_logging = wl;}
 void Simulation::set_att_probs(double p[2][4]){
     for (int i = 0; i < 2; i++){
         double sum = 0;
@@ -128,7 +133,7 @@ void Simulation::run() {
         for (int i = 0; i < servers.size(); i++) {
             servers[i].process_epoch(epoch);
         }
-        stream_waitlist(epoch);
+        if (waitlist_logging){stream_waitlist(epoch);}
     }
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
@@ -237,7 +242,8 @@ int main(int argc, char *argv[]){
         ("priority_order", "Priority order of waitlist", cxxopts::value<std::vector<int>>()->default_value("0,1,2"))
         ("priority_wlist", "Priority waitlist", cxxopts::value<bool>()->default_value("true"))
         ("arrival_probs", "Arrival probabilities", cxxopts::value<std::vector<double>>()->default_value("0.33,0.33,0.33"))
-        ("r,runs", "Number of runs", cxxopts::value<int>()->default_value("1"));
+        ("r,runs", "Number of runs", cxxopts::value<int>()->default_value("1"))
+        ("waitlist_log", "Log waitlist statistics", cxxopts::value<bool>()->default_value("false"))
     ;
 
     auto result = options.parse(argc, argv);
@@ -257,6 +263,7 @@ int main(int argc, char *argv[]){
     std::vector<int> p_order = result["priority_order"].as<std::vector<int>>();
     bool priority_wlist = result["priority_wlist"].as<bool>();
     int runs = result["runs"].as<int>();
+    bool waitlist_logging = result["waitlist_log"].as<bool>();
 
     // set cancellation likelihoods
     double att_probs[2][4] = {
@@ -284,6 +291,7 @@ int main(int argc, char *argv[]){
                                     att_probs,
                                     probs, age_params, 
                                     max_ax_age, waitlist_path,
+                                    waitlist_logging,
                                     dl, wl);
         sim.generate_servers();
         sim.run();

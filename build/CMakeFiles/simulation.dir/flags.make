@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/benja/kidsAbility/MultiApptSimulations/include
+CXX_INCLUDES = -I/home/benja/kidsAbility/MultiApptSimulations/include -I/home/benja/kidsAbility/MultiApptSimulations/cxxopts -I/home/benja/kidsAbility/MultiApptSimulations/extern/cxxopts/include
 
 CXX_FLAGS = -g
 

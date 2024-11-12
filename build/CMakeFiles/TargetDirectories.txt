@@ -32,3 +32,13 @@
 /home/benja/kidsAbility/MultiApptSimulations/build/CMakeFiles/test.dir
 /home/benja/kidsAbility/MultiApptSimulations/build/CMakeFiles/edit_cache.dir
 /home/benja/kidsAbility/MultiApptSimulations/build/CMakeFiles/rebuild_cache.dir
+/home/benja/kidsAbility/MultiApptSimulations/build/extern/cxxopts/CMakeFiles/package.dir
+/home/benja/kidsAbility/MultiApptSimulations/build/extern/cxxopts/CMakeFiles/package_source.dir
+/home/benja/kidsAbility/MultiApptSimulations/build/extern/cxxopts/CMakeFiles/test.dir
+/home/benja/kidsAbility/MultiApptSimulations/build/extern/cxxopts/CMakeFiles/edit_cache.dir
+/home/benja/kidsAbility/MultiApptSimulations/build/extern/cxxopts/CMakeFiles/rebuild_cache.dir
+/home/benja/kidsAbility/MultiApptSimulations/build/extern/cxxopts/include/CMakeFiles/package.dir
+/home/benja/kidsAbility/MultiApptSimulations/build/extern/cxxopts/include/CMakeFiles/package_source.dir
+/home/benja/kidsAbility/MultiApptSimulations/build/extern/cxxopts/include/CMakeFiles/test.dir
+/home/benja/kidsAbility/MultiApptSimulations/build/extern/cxxopts/include/CMakeFiles/edit_cache.dir
+/home/benja/kidsAbility/MultiApptSimulations/build/extern/cxxopts/include/CMakeFiles/rebuild_cache.dir

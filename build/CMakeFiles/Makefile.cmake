@@ -11,6 +11,9 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.22.1/CMakeCCompiler.cmake"
   "CMakeFiles/3.22.1/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.22.1/CMakeSystem.cmake"
+  "../extern/cxxopts/CMakeLists.txt"
+  "../extern/cxxopts/cmake/cxxopts.cmake"
+  "../extern/cxxopts/include/CMakeLists.txt"
   "/usr/lib/cmake/nlohmann_json/nlohmann_jsonConfig.cmake"
   "/usr/lib/cmake/nlohmann_json/nlohmann_jsonConfigVersion.cmake"
   "/usr/lib/cmake/nlohmann_json/nlohmann_jsonTargets.cmake"
@@ -56,6 +59,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake-3.22/Modules/CMakeGenericSystem.cmake"
   "/usr/share/cmake-3.22/Modules/CMakeInitializeConfigs.cmake"
   "/usr/share/cmake-3.22/Modules/CMakeLanguageInformation.cmake"
+  "/usr/share/cmake-3.22/Modules/CMakePackageConfigHelpers.cmake"
   "/usr/share/cmake-3.22/Modules/CMakeParseImplicitIncludeInfo.cmake"
   "/usr/share/cmake-3.22/Modules/CMakeParseImplicitLinkInfo.cmake"
   "/usr/share/cmake-3.22/Modules/CMakeParseLibraryArchitecture.cmake"
@@ -137,6 +141,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake-3.22/Modules/FindPkgConfig.cmake"
   "/usr/share/cmake-3.22/Modules/FindThreads.cmake"
   "/usr/share/cmake-3.22/Modules/FindZLIB.cmake"
+  "/usr/share/cmake-3.22/Modules/GNUInstallDirs.cmake"
   "/usr/share/cmake-3.22/Modules/Internal/CheckSourceCompiles.cmake"
   "/usr/share/cmake-3.22/Modules/Internal/FeatureTesting.cmake"
   "/usr/share/cmake-3.22/Modules/Platform/Linux-Determine-CXX.cmake"
@@ -146,6 +151,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake-3.22/Modules/Platform/Linux.cmake"
   "/usr/share/cmake-3.22/Modules/Platform/UnixPaths.cmake"
   "/usr/share/cmake-3.22/Modules/SelectLibraryConfigurations.cmake"
+  "/usr/share/cmake-3.22/Modules/WriteBasicConfigVersionFile.cmake"
   "/usr/share/cmake-3.22/Templates/CPackConfig.cmake.in"
   )
 
@@ -166,6 +172,8 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "CPackConfig.cmake"
   "CPackSourceConfig.cmake"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
+  "extern/cxxopts/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "extern/cxxopts/include/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:

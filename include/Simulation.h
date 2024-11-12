@@ -14,8 +14,9 @@ class Simulation{
                 std::vector<int> pathways, std::vector<double> wait_effects, 
                 std::vector<double> modality_effects, std::vector<double> modality_policies,
                 double att_probs[2][4],
-                std::vector<double> probs, std::vector<double> age_params, 
+                std::vector<double> probs, std::vector<double> age_params,
                 double max_ax_age, std::string wl_path,
+                bool waitlist_logging,
                 DischargeList& dl, Waitlist& wl);
         
         void generate_servers();
@@ -43,6 +44,7 @@ class Simulation{
         void set_class_dstb(std::discrete_distribution<> class_dstb);
         void set_age_dstb(std::normal_distribution<> age_dstb);
         void set_att_probs(double probs[2][4]);
+        void set_waitlist_logging(bool waitlist_logging);
         // void set_discharge_list(std::string path);
         // void set_waitlist(int n_classes, std::mt19937 &gen, double max_ax_age, DischargeList &dl);
         void stream_waitlist(int epoch);
@@ -69,5 +71,6 @@ class Simulation{
         std::discrete_distribution<> class_dstb;
         std::normal_distribution<> age_dstb;
         parquet::StreamWriter wl_os;
+        bool waitlist_logging = false;
 };
 #endif

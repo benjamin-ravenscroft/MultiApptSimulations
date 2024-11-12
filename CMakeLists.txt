@@ -19,6 +19,9 @@ find_package(Parquet REQUIRED)
 
 add_executable(simulation ${SOURCES})
 target_link_libraries(simulation PRIVATE Arrow::arrow_shared ${PARQUET_SHARED_LIB})
+add_subdirectory(extern/cxxopts) 
+target_include_directories(simulation PRIVATE cxxopts) 
+target_link_libraries(simulation PRIVATE cxxopts)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
