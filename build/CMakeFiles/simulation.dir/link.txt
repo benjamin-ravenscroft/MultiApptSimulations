@@ -1,1 +1,0 @@
-/usr/bin/c++ -g -rdynamic CMakeFiles/simulation.dir/src/simulation.cpp.o CMakeFiles/simulation.dir/src/DischargeList.cpp.o CMakeFiles/simulation.dir/src/Patient.cpp.o CMakeFiles/simulation.dir/src/Server.cpp.o CMakeFiles/simulation.dir/src/Waitlist.cpp.o -o simulation  /usr/lib/x86_64-linux-gnu/libarrow.so.1400.1.0 /usr/lib/x86_64-linux-gnu/libparquet.so.1400.1.0 
