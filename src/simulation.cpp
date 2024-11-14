@@ -91,10 +91,11 @@ void Simulation::set_att_probs(double p[2][4]){
 // Getter methods
 double Simulation::get_arr_age(){
     double age = age_dstb(rng);
-    if (0.5 < age < 2.5) {
-        return 0.5;
+    // std::cout << "Age: " << age << std::endl;
+    if ((0.5 <= age) & (age <= 2.5)) {
+        return age;
     } else if (age < 0.5) {
-        return 0.0;
+        return 0.25;
     } else {
         return 2.5;
     }
@@ -198,32 +199,7 @@ int utilization_to_servers(float utilization, std::vector<int> pathways,
 }
 
 int main(int argc, char *argv[]){
-    // std::string extension_protocols[3] = {"Standard", "Reduced Frequency", "Waitlist"};
-    // std::string extension_protocols[1] = {"Standard"};
-    // int n_epochs = 10000;
-    // int max_caseload = 1;
-    // double arr_lam = 10;
-    // std::vector<int> serv_path = {7, 10, 13};
-    // std::vector<double> wait_effects = {0.6, 0.6, 0.6};
-    // std::vector<double> modality_effects = {0.5, 0.0, -0.5};
-    // std::vector<double> probs = {0.33, 0.33, 0.33};
-    // std::vector<double> modality_policies = {0.5, 0, 1};
-    // double max_ax_age = 3.0;
-    // int runs = 1;
-    // std::vector<double> age_params = {1.5, 1.0};
-
-    // // get number of clinicians from utilization
-    // // float utilization = 1;
-    // // int n_clinicians = utilization_to_servers(utilization, serv_path, probs, arr_lam);
-    // // std::cout << "Number of clinicians for utilization " << utilization << ": " << n_clinicians << std::endl;
-    // int n_clinicians = 80;
-    // std::vector<int> clinicians = {n_clinicians};
-
-    // // set priority ordering of waitlist
-    // std::vector<int> p_order = {0, 1, 2};
-    // bool priority_wlist = true;
-
-    std::string folder = "/mnt/d/OneDrive - University of Waterloo/KidsAbility Research/Service Duration Analysis/C++ Simulations/";
+    // std::string folder = "/mnt/d/OneDrive - University of Waterloo/KidsAbility Research/Service Duration Analysis/C++ Simulations/";
 
     // setup options parsing
     cxxopts::Options options("Service Duration Simulation", "Simulate service duration for multi-class, multi-server queueing system.");
@@ -253,7 +229,8 @@ int main(int argc, char *argv[]){
     int max_caseload = result["max_caseload"].as<int>();
     double arr_lam = result["arr_lam"].as<double>();
     std::vector<double> probs = result["arrival_probs"].as<std::vector<double>>();
-    folder += result["folder"].as<std::string>();
+    // folder += result["folder"].as<std::string>();    // deprecated
+    std::string folder = result["folder"].as<std::string>();
     std::vector<int> serv_path = result["pathways"].as<std::vector<int>>();
     std::vector<double> wait_effects = result["wait_effects"].as<std::vector<double>>();
     std::vector<double> modality_effects = result["modality_effects"].as<std::vector<double>>();

@@ -37,7 +37,8 @@ void DischargeList::add_patient(Patient patient){
     n_patients += 1;
     // discharge_list.push_back(patient);
     // std::cout << "Writing patient to parquet" << std::endl;
-    os << (patient.get_pathway()) << (patient.get_base_duration()) << (patient.get_arrival_t()) << (patient.get_first_appt())
+    os << (patient.get_pathway()) << (patient.get_base_duration()) << (patient.get_arrival_t()) 
+        << (patient.get_arrival_age()) << (patient.get_first_appt())
         << (patient.get_n_appts()) << (patient.get_discharge_time()) << (patient.get_n_ext())
         << (patient.get_sojourn_time()) << (patient.get_total_wait_time()) << (patient.get_discharge_duration())
         << (patient.get_modality_sum())

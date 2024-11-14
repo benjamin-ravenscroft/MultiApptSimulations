@@ -9,11 +9,12 @@ Patient::Patient(int arrival_time, double arrival_age, int pathway, int base_dur
                 const std::array<std::array<double, 4>, 2> (&att_probs),
                 std::mt19937 &gen) : att_probs(att_probs){
     Patient::set_arrival_time(arrival_time);
+    Patient::set_arrival_age(arrival_age);
     Patient::set_pathway(pathway);
     Patient::set_base_duration(base_duration);
     // Patient::set_service_duration(base_duration);    // service duration is set to base duration initially
     Patient::set_wait_ext_beta(wait_ext_beta);
-    Patient::set_modality_ext_beta(modality_ext_beta);
+    Patient::set_modality_effect(modality_ext_beta);
     Patient::set_modality_policy(modality_policy);
     Patient::set_modality_dstb(std::uniform_real_distribution<>(0.0, 1.0));
     Patient::set_extended(0);
@@ -126,11 +127,10 @@ void Patient::set_base_duration(int d){
 void Patient::set_service_duration(int d){service_duration=d;}
 void Patient::set_base_ext_p(double p){base_ext_p=p;}
 void Patient::set_wait_ext_beta(double b){wait_ext_beta=b;}
-void Patient::set_modality_ext_beta(double b){queue_ext_beta=b;}
+void Patient::set_modality_effect(double m){modality_effect=m;}
 void Patient::set_discharge_time(int epoch){discharge_time = epoch;}
 void Patient::set_extended(int c){extended=c;}
 void Patient::set_discharge_duration(int d){discharge_duration=d;}
-void Patient::set_modality_effect(double m){modality_effect=m;}
 void Patient::set_age_out(int a){age_out=a;}
 void Patient::set_modality_policy(double p){modality_policy=p;}
 void Patient::set_modality_dstb(std::uniform_real_distribution<> dstb){modality_dstb=dstb;}
@@ -145,6 +145,8 @@ int Patient::get_arrival_t(){return arrival_time;}
 double Patient::get_age(int epoch){
     return arrival_age + (epoch - arrival_time)/52;    // convert weeks to years
 }
+
+float Patient::get_arrival_age(){return float(arrival_age);}
 
 int Patient::get_first_appt(){
     if (appt_epochs.size() == 0){

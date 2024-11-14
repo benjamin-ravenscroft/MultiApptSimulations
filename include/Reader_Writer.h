@@ -25,6 +25,9 @@ static std::shared_ptr<GroupNode> SetupSchema() {
     fields.push_back(PrimitiveNode::Make("arrival_t", Repetition::REQUIRED,
                                         Type::INT32, parquet::ConvertedType::INT_32));
 
+    fields.push_back(PrimitiveNode::Make("arrival_age", Repetition::REQUIRED,
+                                        Type::FLOAT, parquet::ConvertedType::NONE));
+
     fields.push_back(PrimitiveNode::Make("first_appt", Repetition::REQUIRED,
                                         Type::INT32, parquet::ConvertedType::INT_32));
 

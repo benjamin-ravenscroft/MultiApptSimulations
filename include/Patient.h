@@ -27,7 +27,6 @@ class Patient{
         void set_service_duration(int d);
         void set_base_ext_p(double p);
         void set_wait_ext_beta(double b);
-        void set_modality_ext_beta(double b);
         void set_discharge_time(int epoch);
         void set_extended(int c);
         void set_discharge_duration(int d);
@@ -41,6 +40,7 @@ class Patient{
         int get_base_duration();
         int get_arrival_t();
         double get_age(int epoch);
+        float get_arrival_age();
         int get_first_appt();
         int get_n_appts();
         int get_n_ext();
