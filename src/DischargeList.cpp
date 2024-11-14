@@ -42,7 +42,7 @@ void DischargeList::add_patient(Patient patient){
         << (patient.get_n_appts()) << (patient.get_discharge_time()) << (patient.get_n_ext())
         << (patient.get_sojourn_time()) << (patient.get_total_wait_time()) << (patient.get_discharge_duration())
         << (patient.get_modality_sum())
-        << (patient.get_pct_face()) << (patient.get_age_out()) << parquet::EndRow;
+        << (patient.get_pct_face()) << (patient.get_age_out()) << (patient.get_age(patient.get_discharge_time())) << parquet::EndRow;
     // std::cout << "Patient written to parquet" << std::endl;
 }
 

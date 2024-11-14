@@ -142,8 +142,8 @@ int Patient::get_base_duration(){return base_duration;}
 
 int Patient::get_arrival_t(){return arrival_time;}
 
-double Patient::get_age(int epoch){
-    return arrival_age + (epoch - arrival_time)/52;    // convert weeks to years
+float Patient::get_age(int epoch){
+    return arrival_age + float(epoch - arrival_time)/52;    // convert weeks to years
 }
 
 float Patient::get_arrival_age(){return float(arrival_age);}

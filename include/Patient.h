@@ -39,7 +39,7 @@ class Patient{
         int get_pathway();
         int get_base_duration();
         int get_arrival_t();
-        double get_age(int epoch);
+        float get_age(int epoch);
         float get_arrival_age();
         int get_first_appt();
         int get_n_appts();

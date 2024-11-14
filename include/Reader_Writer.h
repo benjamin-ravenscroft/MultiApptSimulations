@@ -58,6 +58,9 @@ static std::shared_ptr<GroupNode> SetupSchema() {
     fields.push_back(PrimitiveNode::Make("age_out", Repetition::REQUIRED,
                                         Type::INT32, parquet::ConvertedType::INT_32));
 
+    fields.push_back(PrimitiveNode::Make("age", Repetition::REQUIRED,
+                                        Type::FLOAT, parquet::ConvertedType::NONE));
+
     return std::static_pointer_cast<GroupNode>(
         GroupNode::Make("schema", Repetition::REQUIRED, fields));
         
