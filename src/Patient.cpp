@@ -33,7 +33,7 @@ int Patient::check_attendance(int modality) {
     float prob = modality_dstb(rng);
     if (prob <= att_probs[modality][0]) {
         return 0;
-    } else if (prob <= att_probs[modality][1] + att_probs[modality][2]) {
+    } else if (prob <= att_probs[modality][2]) {
         return 1;
     } else {
         return 2;
