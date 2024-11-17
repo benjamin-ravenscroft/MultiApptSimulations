@@ -220,6 +220,8 @@ int main(int argc, char *argv[]){
         ("arrival_probs", "Arrival probabilities", cxxopts::value<std::vector<double>>()->default_value("0.33,0.33,0.33"))
         ("r,runs", "Number of runs", cxxopts::value<int>()->default_value("1"))
         ("waitlist_log", "Log waitlist statistics", cxxopts::value<bool>()->default_value("false"))
+        ("virtual_att_probs", "Attendance probabilities for virtual appointments", cxxopts::value<std::vector<double>>()->default_value("0.9,0.025,0.025,0.05"))
+        ("face_att_probs", "Attendance probabilities for in person appointments", cxxopts::value<std::vector<double>>()->default_value("0.8,0.05,0.05,0.1"))
     ;
 
     auto result = options.parse(argc, argv);
@@ -241,12 +243,21 @@ int main(int argc, char *argv[]){
     bool priority_wlist = result["priority_wlist"].as<bool>();
     int runs = result["runs"].as<int>();
     bool waitlist_logging = result["waitlist_log"].as<bool>();
+    std::vector<double> virtual_att_probs = result["virtual_att_probs"].as<std::vector<double>>();
+    std::vector<double> face_att_probs = result["face_att_probs"].as<std::vector<double>>();
 
     // set cancellation likelihoods
-    double att_probs[2][4] = {
-        {0.879,0.025,0.063,0.033},
-        {0.836,0.047,0.067,0.049}
-    };
+    // double att_probs[2][4] = {
+    //     {0.9,0.025,0.025,0.05},
+    //     {0.8,0.05,0.05,0.10}
+    // };
+    double att_probs[2][4] = {0};
+    for (int i = 0; i < 4; i++) {
+        att_probs[0][i] = virtual_att_probs[i];
+    }
+    for (int i = 0; i < 4; i++) {
+        att_probs[1][i] = face_att_probs[i];
+    }
 
     // create output paths
     std::string path = folder;
