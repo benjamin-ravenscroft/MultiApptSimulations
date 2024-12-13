@@ -97,3 +97,17 @@ std::pair<Patient, int> Waitlist::get_patient(int epoch){
         }
     }
 }
+
+void Waitlist::clear_waitlist(int epoch){
+    for (auto & i : classes) {
+        while (waitlist[i].size() > 0) {
+            std::pair<Patient, int> pair = waitlist[i].front();
+            waitlist[i].pop_front();
+            if (pair.first.get_age(epoch) > max_ax_age){
+                pair.first.set_discharge_time(epoch);
+                pair.first.set_age_out(1);
+                discharge_list.add_patient(pair.first);
+            }
+        }
+    }
+}

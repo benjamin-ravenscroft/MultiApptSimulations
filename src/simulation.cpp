@@ -136,6 +136,8 @@ void Simulation::run() {
         }
         if (waitlist_logging){stream_waitlist(epoch);}
     }
+    // clear the aged-out patients from the waitlist
+    wl.clear_waitlist(n_epochs);
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
     std::cout << "Simulation duration: " << duration.count() << "s." << std::endl;
@@ -213,8 +215,8 @@ int main(int argc, char *argv[]){
         ("w,wait_effects", "Wait time effects", cxxopts::value<std::vector<double>>()->default_value("0.6,0.6,0.6"))
         ("e,modality_effects", "Modality effects", cxxopts::value<std::vector<double>>()->default_value("0.5,0.0,-0.5"))
         ("o,modality_policies", "Modality policies", cxxopts::value<std::vector<double>>()->default_value("0.5,0,1"))
-        ("x,max_ax_age", "Maximum age for ax", cxxopts::value<double>()->default_value("3.0"))
-        ("g,age_params", "Age parameters", cxxopts::value<std::vector<double>>()->default_value("1.5,1.0"))
+        ("x,max_ax_age", "Maximum age for ax", cxxopts::value<double>()->default_value("4.0"))
+        ("g,age_params", "Age parameters", cxxopts::value<std::vector<double>>()->default_value("1.9,0"))
         ("priority_order", "Priority order of waitlist", cxxopts::value<std::vector<int>>()->default_value("0,1,2"))
         ("priority_wlist", "Priority waitlist", cxxopts::value<bool>()->default_value("true"))
         ("arrival_probs", "Arrival probabilities", cxxopts::value<std::vector<double>>()->default_value("0.33,0.33,0.33"))
@@ -258,6 +260,9 @@ int main(int argc, char *argv[]){
     for (int i = 0; i < 4; i++) {
         att_probs[1][i] = face_att_probs[i];
     }
+
+    // print out the modality policies
+    std::cout << "Modality policy: " << modality_policies[0] << std::endl;
 
     // create output paths
     std::string path = folder;

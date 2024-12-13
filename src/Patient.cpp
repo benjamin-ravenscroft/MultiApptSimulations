@@ -73,16 +73,20 @@ float Patient::calculate_wait_effect(){
     return wait_ext_beta*(float(total_wait_time)/52);  // convert weeks to years
 }
 
+template <typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
+
 // add the wait time effect to service duration
 // Round wait effect to integer
 void Patient::add_wait_effect(){
     float wait_effect = calculate_wait_effect();
     float whole = floor(wait_effect);
-    float frac = wait_effect - whole;
+    float frac = abs(wait_effect) - abs(whole); // need to make this sign invariant
     if (modality_dstb(rng) < 1 - frac) {
-        Patient::set_base_duration(base_duration + int(whole));
+        Patient::set_base_duration(std::max(1, base_duration + int(whole)));
     } else {
-        Patient::set_base_duration(base_duration + int(whole) + 1);
+        Patient::set_base_duration(std::max(1, base_duration + int(whole) + sgn(whole)));
     }
 }
 
